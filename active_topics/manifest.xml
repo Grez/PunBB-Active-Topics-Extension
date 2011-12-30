@@ -79,12 +79,17 @@ if (file_exists($ext_info['path'].'/lang/'.$forum_user['language'].'/'.$ext_info
 </div>
 <?php
 $query = array(
-	'SELECT'	=> 't.id, t.poster, t.subject, t.posted, t.first_post_id, t.last_post, t.last_post_id, t.last_poster, t.num_views, t.num_replies, t.closed, t.sticky, t.moved_to',
+	'SELECT'	=> 't.id, t.poster, t.subject, t.posted, t.first_post_id, t.last_post, t.last_post_id, t.last_poster, t.num_views, t.num_replies, t.closed, t.sticky, t.moved_to, f.forum_name',
 	'FROM'		=> 'topics AS t',
 	'JOINS'		=> array(
 		array(
 			'LEFT JOIN'		=> 'forum_perms AS fp',
 			'ON'			=> '(fp.forum_id=t.forum_id AND fp.group_id='.$forum_user['g_id'].')'
+		),
+		
+		array(
+			'LEFT JOIN'		=> 'forums AS f',
+			'ON'			=> 'f.id = t.forum_id'
 		)
 	),
 	'WHERE'		=> '(fp.read_forum IS NULL OR fp.read_forum=1) AND t.moved_to IS NULL',
@@ -137,7 +142,7 @@ while($cur_topic = $forum_db->fetch_assoc($result)) {
 		if ($forum_config['o_censoring'] == '1')
 			$cur_topic['subject'] = censor_words($cur_topic['subject']);
 
-		$forum_page['item_subject']['starter'] = '<span class="item-starter">'.sprintf($lang_forum['Topic starter'], forum_htmlencode($cur_topic['poster'])).'</span>';
+		$forum_page['item_subject']['starter'] = '<span class="item-starter">'.forum_htmlencode($cur_topic['forum_name']).'</span>';
 
 		// Assemble the Topic heading
 
